@@ -39,7 +39,7 @@ parser.add_argument("--animation-interval", type=float, default = 0.2)
 ## ==================== End of Advanced settings ====================
 
 
-args = parser.parse_args()     
+args = parser.parse_args(args=[]) # 改动1/1, args = parser.parse_args()      
 def validate_environment_parameters(env_size, start_state, target_state, forbidden_states):
     if not (isinstance(env_size, tuple) or isinstance(env_size, list) or isinstance(env_size, np.ndarray)) and len(env_size) != 2:
         raise ValueError("Invalid environment size. Expected a tuple (rows, cols) with positive dimensions.")
