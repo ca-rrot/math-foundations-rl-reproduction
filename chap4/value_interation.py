@@ -23,8 +23,10 @@ def value_interation(env, gamma, threshold):
                     q_values.append(reward + gamma * old_values[next_y, next_x])
 
                 action_star = int(np.argmax(q_values))
+                # 策略更新
                 policy[y, x, :] = 0.0
                 policy[y, x, action_star] = 1.0
+                # 状态值更新
                 values[y, x] = q_values[action_star]
 
                 delta = max(delta, abs(values[y, x] - old_values[y, x]))
