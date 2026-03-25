@@ -15,6 +15,10 @@ def MC_basic(env, gamma):
         
         for y in range(height):
             for x in range(width):
+
+                if env._is_done((x, y)):
+                    continue
+                
                 q_values = []
                 for  action in env.action_space:
                    
@@ -34,8 +38,10 @@ def MC_basic(env, gamma):
                         
                         for t in range(1, 100):
                             # 按照当前policy选择一个action
-                            sample_action = np.random.choice(len(env.action_space), p=old_policy[state[1], state[0], :])
-                            (next_x, next_y), reward = env._get_next_state_and_reward(state, env.action_space[sample_action])
+                            action_idx = np.random.choice(len(env.action_space), p=old_policy[state[1], state[0], :])
+                            sample_action = env.action_space[action_idx]
+
+                            (next_x, next_y), reward = env._get_next_state_and_reward(state, sample_action)
                             ret += (gamma**t) * reward
                             state = (next_x, next_y)
                             if env._is_done((next_x, next_y)):
