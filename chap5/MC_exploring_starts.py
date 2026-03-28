@@ -22,6 +22,8 @@ def MC_exporing_starts(env, gamma):
         for _ in range(200):
             # 随机(s, a)
             state = (np.random.randint(width), np.random.randint(height))
+            if env._is_done(state):
+                continue
             action_idx = np.random.choice(n_actions)
             action = env.action_space[action_idx]
 
@@ -32,17 +34,19 @@ def MC_exporing_starts(env, gamma):
                 (next_x, next_y), reward = env._get_next_state_and_reward(state, action)
                 episode.append((state, action_idx, reward))
 
-                if env._is_done((next_x, next_y)):
+                # 更新state
+                state = (next_x, next_y)
+                if env._is_done(state):
                     break
                 
-                state = (next_x, next_y)
-                action_idx = np.random.choice(len(env.action_space), p=old_policy[next_y, next_x])
+                # 根据当前策略更新action
+                action_idx = np.random.choice(n_actions, p=old_policy[next_y, next_x])
                 action = env.action_space[action_idx]
 
             G = 0
             visited_pairs = set()
 
-            for state, action, reward in reversed(episode):
+            for state, action_idx, reward in reversed(episode):
                 # policy evaluation and policy improvement
                 G = reward + gamma * G
 
@@ -52,8 +56,8 @@ def MC_exporing_starts(env, gamma):
 
                 x, y = state
                 returns_sum[y, x, action_idx] += G
-                returns_count[y, x, action] += 1
-                q_values[y, x, action] = returns_sum[y, x, action] / returns_count[y, x, action]
+                returns_count[y, x, action_idx] += 1
+                q_values[y, x, action_idx] = returns_sum[y, x, action_idx] / returns_count[y, x, action_idx]
 
                 action_star = int(np.argmax(q_values[y, x, :]))
                 policy[y, x, :] = 0
